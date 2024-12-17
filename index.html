@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Titan Dynamics </title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Dashboard Login Container -->
+  <div class="dashboard-login">
+    <!-- Logo Container with Animation -->
+    <div class="logo-container">
+      <div class="container">
+        <img src="logo/titan.PNG" alt="Image 1" class="image" id="img1">
+        <img src="logo/bottomline.PNG" alt="Image 2" class="image" id="img2">
+        <img src="logo/dynamics.PNG" alt="Image 3" class="image" id="img3">
+        <img src="logo/terminal.PNG" alt="Image 4" class="image" id="img4">
+        <img src="logo/logo.PNG" alt="Image 5" class="image" id="img5">
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="form">
+      <div class="input-container">
+        <i class="icon">profile/</i>
+        <input type="text" id="username" autocomplete="off" onfocus="clearUsername()" maxlength="22" oninput="validateUsername()">
+      </div>
+      <button class="authenticate-btn" onclick="authenticate()">
+        AUTHENTICATE
+      </button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Function to load a random username from names.txt
+    async function loadRandomUsername() {
+      try {
+        const response = await fetch('./media/names.txt'); 
+        if (!response.ok) throw new Error('Failed to load names.txt');
+        const text = await response.text();
+        const names = text.split('\n').filter(name => name.trim() !== "");
+        document.getElementById('username').value = names[Math.floor(Math.random() * names.length)];
+      } catch (error) {
+        console.error("Error fetching names.txt:", error);
+      }
+    }
+
+    function validateUsername() {
+      const usernameField = document.getElementById('username');
+      const regex = /^[A-Za-z0-9\u4e00-\u9fa5\u0800-\u4e00]*$/;
+      if (!regex.test(usernameField.value)) usernameField.value = usernameField.value.slice(0, -1);
+    }
+
+    function authenticate() {
+      const username = document.getElementById('username').value;
+
+      if (username) {
+        // Save username to localStorage
+        localStorage.setItem('username', username);
+
+        // Trigger the animation
+        startAnimation();
+
+        // Wait for the animation duration before redirecting
+        setTimeout(() => {
+          alert(`// Welcome, ${username} //`);
+          window.location.href = './programs/programs.html';
+        }, 2000); // Adjust to match your CSS animation duration
+      } else {
+        alert('Please enter a username');
+      }
+    }
+
+    function startAnimation() {
+  const img1 = document.getElementById("img1");
+  const img2 = document.getElementById("img2");
+  const img3 = document.getElementById("img3");
+  const img4 = document.getElementById("img4");
+  const img5 = document.getElementById("img5");
+
+  // Move images off-frame
+  img1.style.transform = "translate(400%, 0%)";
+  img2.style.transform = "translate(0%, 300%)";
+  img3.style.transform = "translate(-400%, 0%)";
+  img4.style.transform = "translate(0%, 300%)";
+
+  // Zoom in and fade out the final image
+  img5.style.transform = "scale(3)";
+  img5.style.opacity = "0";
+
+  // Get the input container, input, and button elements
+  const inputContainer = document.querySelector('.input-container');
+  const input = document.getElementById('username');
+  const button = document.querySelector('.authenticate-btn');
+
+  // Apply the fade-out class to the input container, input, and button
+  inputContainer.classList.add('fade-out');
+  input.classList.add('fade-out');
+  button.classList.add('fade-out');
+
+  // Add transition duration for all images and elements
+  const images = [img1, img2, img3, img4, img5];
+  images.forEach(img => {
+    img.style.transition = "transform 2s ease, opacity 2s ease"; // Adjust as needed
+  });
+}
+
+    window.onload = loadRandomUsername;
+  </script>
+</body>
+</html>
