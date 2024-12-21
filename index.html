@@ -37,14 +37,22 @@
   <script>
     // Function to load a random username from names.txt
     async function loadRandomUsername() {
-      try {
-        const response = await fetch('./media/names.txt'); 
-        if (!response.ok) throw new Error('Failed to load names.txt');
-        const text = await response.text();
-        const names = text.split('\n').filter(name => name.trim() !== "");
-        document.getElementById('username').value = names[Math.floor(Math.random() * names.length)];
-      } catch (error) {
-        console.error("Error fetching names.txt:", error);
+      // if cookie is undefined, load a random username else return old username
+      if (getCookie("username") == undefined){
+        const username = getCookie("username");
+        try {
+          const response = await fetch('./media/names.txt'); 
+          if (!response.ok) throw new Error('Failed to load names.txt');
+          const text = await response.text();
+          const names = text.split('\n').filter(name => name.trim() !== "");
+          document.getElementById('username').value = names[Math.floor(Math.random() * names.length)];
+        } catch (error) {
+          console.error("Error fetching names.txt:", error);
+        }
+      }
+      else{
+        const username = getCookie("username");
+        document.getElementById("username").value = username;
       }
     }
 
@@ -55,24 +63,23 @@
     }
 
     function authenticate() {
-      const username = document.getElementById('username').value;
+      let username = document.getElementById('username').value;
+      if (!username) {
+        username = getCookie("username");
+      }
 
       if (username) {
-        // Save username to localStorage
         localStorage.setItem('username', username);
-
-        // Trigger the animation
+        setCookie("username", username, 100);
         startAnimation();
-
-        // Wait for the animation duration before redirecting
         setTimeout(() => {
-          alert(`// Welcome, ${username} //`);
           window.location.href = './programs/programs.html';
-        }, 2000); // Adjust to match your CSS animation duration
+        }, 2000);
       } else {
         alert('Please enter a username');
       }
-    }
+}
+
 
     function startAnimation() {
   const img1 = document.getElementById("img1");
@@ -106,9 +113,30 @@
   images.forEach(img => {
     img.style.transition = "transform 2s ease, opacity 2s ease"; // Adjust as needed
   });
+  
+  //Function For saving to Cookies
+  
+}
+function setCookie(name, value, years) {
+    const date = new Date();
+    date.setTime(date.getTime() + years * 365 * 12 * 24 * 60 * 60 * 1000); 
+    const expires = "expires=" + date.toUTCString(); 
+    document.cookie = `${name}=${value};${expires}; path=/`;
+
+    if (navigator.cookieEnabled == false) {
+        alert("Please enable cookies to save your username");
+    }
+}
+function getCookie(name) {
+  const cookies = document.cookie.split('; ');
+  for (let cookie of cookies) {
+    const [key, value] = cookie.split('=');
+    if (key === name) return decodeURIComponent(value);
+  }
+  return undefined;
 }
 
-    window.onload = loadRandomUsername;
+  window.onload = loadRandomUsername;
   </script>
 </body>
 </html>
